@@ -18,5 +18,5 @@ UseMatrixExponential = 1;   % set to zero for forward integration
 if (UseMatrixExponential),
     Rplus = Rexp(gyros, deltaT) * Rminus;
 else
-    Rplus = Rminus - rcross(gyros) * Rminus * deltaT ;
+    Rplus = Rminus - rcross(gyros) * Rminus * deltaT;
 end

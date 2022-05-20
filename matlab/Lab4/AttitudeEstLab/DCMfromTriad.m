@@ -1,4 +1,4 @@
-function R = DCMfromTrial(mags, accels, magInertial, accelInertial)
+function R = DCMfromTriad(mags, accels, magInertial, accelInertial)
 % function R = DCMfromTrial(mags, accels, magInertial, accelInertial)
 %
 % Implements a solution to Wahba's problem based in the TRIAD algorithm to
