@@ -210,6 +210,7 @@ int main(void) {
     float Raligned[3];
     EulerAngles(Rmisalignment, Raligned);
     printf("%f, %f, %f\r\n", Raligned[0], Raligned[1], Raligned[2]);
+    int j;
     // the result from the above is: -39.444901, -26.237944, 1.494833
     
     //    while (1) {
