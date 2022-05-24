@@ -1,4 +1,5 @@
-function [Rplus, Bplus] = IntegrateClosedLoop(Rminus, Bminus, gyros, mags, accels, magInertial, accelInertial, deltaT)
+function [Rplus, Bplus] = IntegrateClosedLoop(Rminus, Bminus, gyros, mags, ...
+    accels, magInertial, accelInertial, Kp_a, Ki_a, Kp_m, Ki_m, deltaT)
 % function [Rplus, Bplus] = IntegrateClosedLoop(Rminus, Bminus, gyros, mags, accels, magInertial, accelInertial, deltaT)
 %
 % Function to implement the full complementary estimate and integration of
@@ -22,12 +23,6 @@ function [Rplus, Bplus] = IntegrateClosedLoop(Rminus, Bminus, gyros, mags, accel
 % accels should match their respective reference inertial vectors. The
 % gains are constant and set internally, modify as needed.
 
-
-Kp_a=10;
-Ki_a=Kp_a/10;
-
-Kp_m=10;
-Ki_m=Kp_m/10;
 
 accels = accels/norm(accels);                       % set mags and accels to unit vectors
 mags = mags/norm(mags);
