@@ -1,8 +1,8 @@
 build/default/production/_ext/2049610667/I2C.o: ../../Common/I2C.c \
- ../../Common/BOARD.h ../../Common/serial.h ../../Common/I2C.h
+ BOARD.h serial.h I2C.h
 
-../../Common/BOARD.h:
+BOARD.h:
 
-../../Common/serial.h:
+serial.h:
 
-../../Common/I2C.h:
+I2C.h:

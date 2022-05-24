@@ -1,6 +1,6 @@
 build/default/production/_ext/2049610667/BOARD.o: ../../Common/BOARD.c \
- ../../Common/BOARD.h ../../Common/serial.h
+ BOARD.h serial.h
 
-../../Common/BOARD.h:
+BOARD.h:
 
-../../Common/serial.h:
+serial.h:

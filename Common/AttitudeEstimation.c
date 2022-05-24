@@ -200,21 +200,37 @@ int main(void) {
         {0, 0, 1}
     };
 
-    while (1) {
-        gyroXYZ[0] = ((BNO055_ReadGyroX() + GyroXOffset) / Raw2AngleConv) * deg2rad; // Read and convert X
-        gyroXYZ[1] = ((BNO055_ReadGyroY() + GyroYOffset) / Raw2AngleConv) * deg2rad; // Read and convert Y
-        gyroXYZ[2] = ((BNO055_ReadGyroZ() - GyroZOffset) / Raw2AngleConv) * deg2rad; // Read and convert Z
+    // these are the values returned from the "part7_AccelMag_Misalignment.m" function
+    float Rmisalignment[3][3] = {
+        {0.8967, 0.0234, 0.4421},
+        {0.2606, 0.7793, -0.5699},
+        {-0.3579, 0.6262, 0.6927}
+    };
 
-        IntegrateOpenLoop(Rminus, gyroXYZ, DELTA_T, Rplus);
-        EulerAngles(Rplus, eulerAngles);
-        memcpy(Rminus, Rplus, 3 * 3 * sizeof (float));
-
-        sprintf(OledOutput, "Roll: %f\nPitch: %f\nYaw: %f\r\n", eulerAngles[1], eulerAngles[0], eulerAngles[2]); // print roll, pitch, yaw
-        OledDrawString(OledOutput);
-        OledUpdate();
-
-        time = TIMERS_GetMilliSeconds(); // make a start time
-        while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
-    }
+    float Raligned[3];
+    EulerAngles(Rmisalignment, Raligned);
+    printf("%f, %f, %f\r\n", Raligned[0], Raligned[1], Raligned[2]);
+    // the result from the above is: -39.444901, -26.237944, 1.494833
+    
+    //    while (1) {
+    //        //printf("\n\n\n");
+    //        //for (int i = 0; i <= 500; i++) {
+    //
+    //        //  printf("%d, %d, %d, %d, %d, %d\r\n", BNO055_ReadAccelX(), BNO055_ReadAccelY(), BNO055_ReadAccelZ(), BNO055_ReadMagX(), BNO055_ReadMagY(), BNO055_ReadMagZ());
+    //        gyroXYZ[0] = ((BNO055_ReadGyroX() + GyroXOffset) / Raw2AngleConv) * deg2rad; // Read and convert X
+    //        gyroXYZ[1] = ((BNO055_ReadGyroY() + GyroYOffset) / Raw2AngleConv) * deg2rad; // Read and convert Y
+    //        gyroXYZ[2] = ((BNO055_ReadGyroZ() - GyroZOffset) / Raw2AngleConv) * deg2rad; // Read and convert Z
+    //
+    //        IntegrateOpenLoop(Rminus, gyroXYZ, DELTA_T, Rplus);
+    //        EulerAngles(Rplus, eulerAngles);
+    //        memcpy(Rminus, Rplus, 3 * 3 * sizeof (float));
+    //
+    //        sprintf(OledOutput, "Roll: %f\nPitch: %f\nYaw: %f\r\n", eulerAngles[1], eulerAngles[0], eulerAngles[2]); // print roll, pitch, yaw
+    //        OledDrawString(OledOutput);
+    //        OledUpdate();
+    //
+    //        time = TIMERS_GetMilliSeconds(); // make a start time
+    //        while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
+    //    }
     return 0;
 }
