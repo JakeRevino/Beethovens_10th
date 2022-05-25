@@ -35,7 +35,7 @@ Int2 = IntegrateOpenLoop(C, gyroInputWithBias, 0.02, 1);
 E2 = dcm2eul(Int1);
 E3 = dcm2eul(Int2);
 
-% norms of the data using both methods
+% norms of the data 
 Int1_1 = norm(Int1(:, 1)) % yaw norm with forward integration
 Int1_2 = norm(Int1(:, 2)) % pitch norm with forward integration
 Int1_3 = norm(Int1(:, 3)) % roll norm with forward integration
@@ -43,18 +43,16 @@ Int2_1 = norm(Int2(:, 1)) % yaw norm with exponential
 Int2_2 = norm(Int2(:, 2)) % pitch norm with exponential
 Int2_3 = norm(Int2(:, 3)) % roll norm with exponential
 
-% obtain euler angles
 E1 = rad2deg(E1)
 E2 = rad2deg(E2)
 E3 = rad2deg(E3)
 
-m1 = mean(sqrt((E2-E1).^2)) % mean using forward integration
-m2 = mean(sqrt((E3-E1).^2)) % mean using matrix exponential
+m1 = mean(sqrt((E2-E1).^2))
+m2 = mean(sqrt((E3-E1).^2))
 
-std1 = std(sqrt((E2-E1).^2)) % std using forward integration
-std2 = std(sqrt((E3-E1).^2)) % std using matrix exponential
+std1 = std(sqrt((E2-E1).^2))
+std2 = std(sqrt((E3-E1).^2))
 
-% draw histograms to compare
 histfit(sqrt((E2-E1).^2))
 figure()
 histfit(sqrt((E3-E1).^2))
