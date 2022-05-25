@@ -29,13 +29,14 @@ int MatrixEquals2(float mat1[2][2], float mat2[2][2]) {
  */
 void MatrixPrint(float mat[3][3]) {
     int i, j;
-    printf("_________________________\n");
+    printf("\r_________________________\n\r");
     for (i = 0; i < DIM; i++) {
         for (j = 0; j < DIM; j++) {
             printf("%6.2f | ", mat[i][j]);
         }
-        printf("\n-------------------------\n");
+        printf("\n\r-------------------------\n\r");
     }
+    printf("\r_________________________\n\n\n\r");
 }
 
 int MatrixEquals(float mat1[3][3], float mat2[3][3]) {
@@ -55,6 +56,13 @@ void MatrixAdd(float mat1[3][3], float mat2[3][3], float result[3][3]) {
         for (j = 0; j < DIM; j++) {
             result[i][j] = mat1[i][j] + mat2[i][j];
         }
+    }
+}
+
+void MatrixAdd31(float mat1[3][1], float mat2[3][1], float result[3][1]) {
+    int i;
+    for (i = 0; i < DIM; i++) {
+            result[i][0] = mat1[i][0] + mat2[i][0];     
     }
 }
 
@@ -98,6 +106,17 @@ void MatrixMultiply13(float mat1[3][3], float mat2[3], float result[3]) {
     result[2] = mat1[2][0] * mat2[0] + mat1[2][1] * mat2[1] + mat1[2][2] * mat2[2];
 }
 
+void MatrixMultiply31(float mat1[3][3], float mat2[3][1], float result[3][1]) {
+    // need to reset all the values of result to zero to avoid using values from previous test
+    result[0][0] = 0;
+    result[1][0] = 0;
+    result[2][0] = 0;
+
+    result[0][0] = mat1[0][0] * mat2[0][0] + mat1[0][1] * mat2[1][0] + mat1[0][2] * mat2[2][0];
+    result[1][0] = mat1[1][0] * mat2[0][0] + mat1[1][1] * mat2[1][0] + mat1[1][2] * mat2[2][0];
+    result[2][0] = mat1[2][0] * mat2[0][0] + mat1[2][1] * mat2[1][0] + mat1[2][2] * mat2[2][0];
+}
+
 void MatrixScalarAdd(float x, float mat[3][3], float result[3][3]) {
     int i, j;
     for (i = 0; i < DIM; i++) {
@@ -113,6 +132,13 @@ void MatrixScalarMultiply(float x, float mat[3][3], float result[3][3]) {
         for (j = 0; j < DIM; j++) {
             result[i][j] = mat[i][j] * x;
         }
+    }
+}
+
+void MatrixScalarMultiply31(float x, float mat[3][1], float result[3][1]) {
+    int i, j;
+    for (i = 0; i < DIM; i++) {
+        result[i][0] = mat[i][0] * x;
     }
 }
 

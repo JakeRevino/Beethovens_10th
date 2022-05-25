@@ -164,4 +164,9 @@ float MatrixDeterminant(float mat[3][3]);
  */
 void MatrixInverse(float mat[3][3], float result[3][3]);
 
+void MatrixAdd31(float mat1[3][1], float mat2[3][1], float result[3][1]);
+void MatrixMultiply31(float mat1[3][3], float mat2[3][1], float result[3][1]);
+void MatrixScalarMultiply31(float x, float mat[3][1], float result[3][1]);
+
+
 #endif // MATRIX_MATH_H
