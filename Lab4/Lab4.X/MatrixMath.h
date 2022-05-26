@@ -68,6 +68,27 @@ int MatrixEquals(float mat1[3][3], float mat2[3][3]);
  */
 void MatrixAdd(float mat1[3][3], float mat2[3][3], float result[3][3]);
 
+/**
+ * MatrixAdd31 performs an element-wise matrix addition operation on a 3*3 and
+ * 3*1 matrix "returns" the result by modifying the third argument.
+ * @param: mat1, pointer to a summand 3x3 matrix
+ * @param: mat2, pointer to a summand 3x1 matrix
+ * @param: result, pointer to a 3x1 matrix that is modified to contain the sum of mat1 and mat2.
+ * @return:  None
+ * mat1 and mat2 are not modified by this function.  result is modified by this function.
+ */
+void MatrixAdd31(float mat1[3][1], float mat2[3][1], float result[3][1]);
+
+
+/**
+ * MatrixAdd performs an element-wise matrix subtraction operation on two 3x3 matrices and 
+ * "returns" the result by modifying the third argument.
+ * @param: mat1, pointer to a summand 3x3 matrix
+ * @param: mat2, pointer to a summand 3x3 matrix
+ * @param: result, pointer to a 3x3 matrix that is modified to contain the sum of mat1 and mat2.
+ * @return:  None
+ * mat1 and mat2 are not modified by this function.  result is modified by this function.
+ */
 void MatrixSubtract(float mat1[3][3], float mat2[3][3], float result[3][3]);
 
 /**
@@ -81,7 +102,16 @@ void MatrixSubtract(float mat1[3][3], float mat2[3][3], float result[3][3]);
  */
 void MatrixMultiply(float mat1[3][3], float mat2[3][3], float result[3][3]);
 
-
+/**
+ * MatrixMultiply31 performs a matrix-matrix multiplication operation on a 3*3 and
+ * 3*1 matrix and "returns" the result by modifying the third argument.
+ * @param: mat1, pointer to left factor 3x3 matrix
+ * @param: mat2, pointer to right factor 3x1 matrix
+ * @param: result, pointer to matrix that is modified to contain the matrix product of mat1 and mat2.
+ * @return: none
+ * mat1 and mat2 are not modified by this function.  result is modified by this function.
+ */
+void MatrixMultiply31(float mat1[3][3], float mat2[3][1], float result[3][1]);
 /******************************************************************************
  * Matrix - Scalar Operations
  *****************************************************************************/
@@ -109,6 +139,17 @@ void MatrixScalarAdd(float x, float mat[3][3], float result[3][3]);
  */
 void MatrixScalarMultiply(float x, float mat[3][3], float result[3][3]);
 
+/**
+ * MatrixScalarAdd31 performs the multiplication of a 3*1 matrix and a scalar.
+ * Each element of the matrix is multiplied x.
+ * The result is "returned"by modifying the third argument.
+ * @param: x, a scalar float
+ * @param: mat, pointer to a 3x1 matrix
+ * @param: result, pointer to matrix that is modified to contain mat + x.
+ * @return: none
+ * x and mat are not modified by this function.  result is modified by this function.
+ */
+void MatrixScalarMultiply31(float x, float mat[3][1], float result[3][1]);
 
 /******************************************************************************
  * Unary Matrix Operations
@@ -163,10 +204,6 @@ float MatrixDeterminant(float mat[3][3]);
  * mat is not modified by this function.  result is modified by this function.
  */
 void MatrixInverse(float mat[3][3], float result[3][3]);
-
-void MatrixAdd31(float mat1[3][1], float mat2[3][1], float result[3][1]);
-void MatrixMultiply31(float mat1[3][3], float mat2[3][1], float result[3][1]);
-void MatrixScalarMultiply31(float x, float mat[3][1], float result[3][1]);
 
 
 #endif // MATRIX_MATH_H
