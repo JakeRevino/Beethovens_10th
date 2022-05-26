@@ -36,7 +36,7 @@ magInertial= [22770;5329;41510.2]/1000;
 % PI values for accelerometer and magnetometer components
 
 %accelerometer PI values
-Kp_a=70;
+Kp_a=100;
 Ki_a=0;
 
 %magnetometer PI values
@@ -121,8 +121,8 @@ close all;
 % PI values for accelerometer and magnetometer components
 
 %accelerometer PI values
-Kp_a=70;
-Ki_a=7;
+Kp_a=100;
+Ki_a=1000;
 
 %magnetometer PI values
 Kp_m=0;
@@ -132,12 +132,12 @@ Ki_m=0;
 R=eye(3);
 
 %Gyro bias
-biasEstimate(:,1)=biasTerms;
+biasEstimate(:,1)=[0;0;0];
 
 %Integrate gyroscope angles using feedback from accelerometer
 time(1)=0;
 for i=1:numSteps,
-    gyroInputWithBias=wGyro(i ,:).'-biasTerms;
+    gyroInputWithBias=wGyro(i ,:).';
     [Ro,biasEstimate(:,i+1)] = IntegrateClosedLoop(R, ...
         biasEstimate(:,i),gyroInputWithBias, ...
         Mag(i,:).',Acc(i,:).',magInertial,accelInertial, Kp_a, Ki_a, Kp_m, ...
@@ -208,7 +208,7 @@ Kp_a=0;
 Ki_a=0;
 
 %magnetometer PI values
-Kp_m=35;
+Kp_m=100;
 Ki_m=0;
 
 %Use the identity matrix as initial
@@ -292,19 +292,19 @@ Kp_a=0;
 Ki_a=0;
 
 %magnetometer PI values
-Kp_m=35;
-Ki_m=3.5;
+Kp_m=100;
+Ki_m=1000;
 
 %Use the identity matrix as initial
 R=eye(3);
 
 %Gyro bias
-biasEstimate(:,1)=biasTerms;
+biasEstimate(:,1)=[0;0;0];
 
 %Integrate gyroscope angles using feedback from magnetometer
 time(1)=0;
 for i=1:numSteps,
-    gyroInputWithBias=wGyro(i ,:).'-biasTerms;
+    gyroInputWithBias=wGyro(i ,:).';
     [Ro,biasEstimate(:,i+1)] = IntegrateClosedLoop(R, ...
         biasEstimate(:,i),gyroInputWithBias, ...
         Mag(i,:).',Acc(i,:).',magInertial,accelInertial, Kp_a, Ki_a, Kp_m, ...
@@ -371,11 +371,11 @@ sgtitle("Bias Error PI Magnetometer")
 % PI values for accelerometer and magnetometer components
 
 %accelerometer PI values
-Kp_a=35;
+Kp_a=10;
 Ki_a=0;
 
 %magnetometer PI values
-Kp_m=35;
+Kp_m=10;
 Ki_m=0;
 
 %Use the identity matrix as initial
@@ -455,23 +455,23 @@ sgtitle("Bias Error Proportional Magnetometer and Accelerometer")
 % PI values for accelerometer and magnetometer components
 
 %accelerometer PI values
-Kp_a=35;
-Ki_a=3.5;
+Kp_a=100;
+Ki_a=10;
 
 %magnetometer PI values
-Kp_m=35;
-Ki_m=3.5;
+Kp_m=100;
+Ki_m=10;
 
 %Use the identity matrix as initial
 R=eye(3);
 
 %Gyro bias
-biasEstimate(:,1)=biasTerms;
+biasEstimate(:,1)=[0;0;0];
 
 %Integrate gyroscope angles using feedback from magnetometer and accelerometer
 time(1)=0;
 for i=1:numSteps,
-    gyroInputWithBias=wGyro(i ,:).'-biasTerms;
+    gyroInputWithBias=wGyro(i ,:).';
     [Ro,biasEstimate(:,i+1)] = IntegrateClosedLoop(R, ...
         biasEstimate(:,i),gyroInputWithBias, ...
         Mag(i,:).',Acc(i,:).',magInertial,accelInertial, Kp_a, Ki_a, Kp_m, ...
