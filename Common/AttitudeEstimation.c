@@ -24,9 +24,10 @@
 #define Raw2AngleConv 131.068
 #define DELTA_T 0.02
 #define NUMSTEPS 200
-//#define PART6
+#define PART6
 //#define OL
-#define PART8
+//#define SENSORFUSE_MAG_ACCEL
+//#define PART8
 
 int EulerAngles(float mat[3][3], float angles[3]) {
     float roll, pitch, yaw; //  (X,Y,Z) 
@@ -267,64 +268,98 @@ int IntegrateClosedLoop(float Rminus[3][3], float Bminus[3][1], float gyros[3][1
     return SUCCESS;
 }
 
-#ifdef OL
 int main(void) {
     BOARD_Init();
     BNO055_Init();
-    //    OledInit();
-    //    OledClear(OLED_COLOR_BLACK);
-    //    OledUpdate();
-    //    TIMERS_Init();
-    //
-    //    int time = 0;
-    //    char OledOutput[100];
-    //
-    //    float RotationMatrix[3][3];
-    //    float eulerAngles[3];
-    //    float MatrixExponential;
-    //    float gyroXYZ[3];
-    //    float Rplus[3][3] = {};
-    //    float Rminus[3][3] = {
-    //        {1, 0, 0},
-    //        {0, 1, 0},
-    //        {0, 0, 1}
-    //    };
-    //
-    //    // these are the values returned from the "part7_AccelMag_Misalignment.m" function
-    //    float Rmisalignment[3][3] = {
-    //        {0.8967, 0.0234, 0.4421},
-    //        {0.2606, 0.7793, -0.5699},
-    //        {-0.3579, 0.6262, 0.6927}
-    //    };
-    //
-    //    float Raligned[3];
-    //    EulerAngles(Rmisalignment, Raligned);
-    //    printf("%f, %f, %f\r\n", Raligned[0], Raligned[1], Raligned[2]);
-    //    int j;
-    // the result from the above is: -39.444901, -26.237944, 1.494833
 
-    //    while (1) {
-    //        //printf("\n\n\n");
-    //        //for (int i = 0; i <= 500; i++) {
-    //
-    //        //  printf("%d, %d, %d, %d, %d, %d\r\n", BNO055_ReadAccelX(), BNO055_ReadAccelY(), BNO055_ReadAccelZ(), BNO055_ReadMagX(), BNO055_ReadMagY(), BNO055_ReadMagZ());
-    //        gyroXYZ[0] = ((BNO055_ReadGyroX() + GyroXOffset) / Raw2AngleConv) * deg2rad; // Read and convert X
-    //        gyroXYZ[1] = ((BNO055_ReadGyroY() + GyroYOffset) / Raw2AngleConv) * deg2rad; // Read and convert Y
-    //        gyroXYZ[2] = ((BNO055_ReadGyroZ() - GyroZOffset) / Raw2AngleConv) * deg2rad; // Read and convert Z
-    //
-    //        IntegrateOpenLoop(Rminus, gyroXYZ, DELTA_T, Rplus);
-    //        EulerAngles(Rplus, eulerAngles);
-    //        memcpy(Rminus, Rplus, 3 * 3 * sizeof (float));
-    //
-    //        sprintf(OledOutput, "Roll: %f\nPitch: %f\nYaw: %f\r\n", eulerAngles[1], eulerAngles[0], eulerAngles[2]); // print roll, pitch, yaw
-    //        OledDrawString(OledOutput);
-    //        OledUpdate();
-    //
-    //        time = TIMERS_GetMilliSeconds(); // make a start time
-    //        while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
-    //    }
+#ifdef SENSORFUSE_MAG_ACCEL
+
+    OledInit();
+    OledClear(OLED_COLOR_BLACK);
+    OledUpdate();
+    TIMERS_Init();
+
+    int time = 0;
+    char OledOutput[100];
+
+    float RotationMatrix[3][3];
+    float eulerAngles[3];
+    float MatrixExponential;
+    float gyroXYZ[3][1];
+    float magXYZ[3][1];
+    float accelXYZ[3][1];
+    float magInAccelFrame[3][1];
+    float Rplus[3][3] = {};
+    float Rminus[3][3] = {
+        {1, 0, 0},
+        {0, 1, 0},
+        {0, 0, 1}
+    };
+
+    accelXYZ[0][0] = BNO055_ReadAccelX();
+    accelXYZ[1][0] = BNO055_ReadAccelY();
+    accelXYZ[2][0] = BNO055_ReadAccelZ();
+
+    magXYZ[0][0] = BNO055_ReadMagX();
+    magXYZ[1][0] = BNO055_ReadMagY();
+    magXYZ[2][0] = BNO055_ReadMagZ();
+
+    // these are the values returned from the "part7_AccelMag_Misalignment.m" function
+    float Rmisalignment[3][3] = {
+        {0.9986, 0.0432, 0.0305},
+        {-0.0403, 0.9952, -0.0889},
+        {-0.0342, 0.0876, 0.9956}
+    };
+
+    float Raligned[3];
+    EulerAngles(Rmisalignment, Raligned);
+    printf("%f, %f, %f\r\n", Raligned[0], Raligned[1], Raligned[2]);
+    // the result from the above is: -5.102573, -1.747792, 2.477103
+
+
+    MatrixMultiply31(Rmisalignment, magXYZ, magInAccelFrame); // end part7
 #endif
-    
+#ifdef OL
+    OledInit();
+    OledClear(OLED_COLOR_BLACK);
+    OledUpdate();
+    TIMERS_Init();
+
+    int time = 0;
+    char OledOutput[100];
+
+    float RotationMatrix[3][3];
+    float eulerAngles[3];
+    float MatrixExponential;
+    float gyroXYZ[3];
+    float Rplus[3][3] = {};
+    float Rminus[3][3] = {
+        {1, 0, 0},
+        {0, 1, 0},
+        {0, 0, 1}
+    };
+    while (1) {
+        //printf("\n\n\n");
+        //for (int i = 0; i <= 500; i++) {
+
+        //  printf("%d, %d, %d, %d, %d, %d\r\n", BNO055_ReadAccelX(), BNO055_ReadAccelY(), BNO055_ReadAccelZ(), BNO055_ReadMagX(), BNO055_ReadMagY(), BNO055_ReadMagZ());
+        gyroXYZ[0] = ((BNO055_ReadGyroX() + GyroXOffset) / Raw2AngleConv) * deg2rad; // Read and convert X
+        gyroXYZ[1] = ((BNO055_ReadGyroY() + GyroYOffset) / Raw2AngleConv) * deg2rad; // Read and convert Y
+        gyroXYZ[2] = ((BNO055_ReadGyroZ() - GyroZOffset) / Raw2AngleConv) * deg2rad; // Read and convert Z
+
+        IntegrateOpenLoop(Rminus, gyroXYZ, DELTA_T, Rplus);
+        EulerAngles(Rplus, eulerAngles);
+        memcpy(Rminus, Rplus, 3 * 3 * sizeof (float));
+
+        sprintf(OledOutput, "Roll: %f\nPitch: %f\nYaw: %f\r\n", eulerAngles[1], eulerAngles[0], eulerAngles[2]); // print roll, pitch, yaw
+        OledDrawString(OledOutput);
+        OledUpdate();
+
+        time = TIMERS_GetMilliSeconds(); // make a start time
+        while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
+    }
+#endif
+
 #ifdef PART6
     float gyroInput[3][1] = {
         {0},
@@ -417,127 +452,126 @@ int main(void) {
         MatrixPrint(R);
     }
     return 0;
-}
+
 #endif
-
-
-
 #ifdef PART8
-int main(void){
-    float Kp_a = 10, Ki_a = 1, Kp_m = 0, Ki_m = 0;
-    float deltaT = 0.02;
-    float gyroXYZ[3];
-    float accelXYZ[3];
-    float magXYZ[3];
-    float Bplus[3][1];
-    float Rplus[3][3];
-    float angles[3];
-    float Rmisalignment[3][3] = {
-        {0.8967, 0.0234, 0.4421},
-        {0.2606, 0.7793, -0.5699},
-        {-0.3579, 0.6262, 0.6927}
-    };
-    float biasTerms[3][1] = {
-        {GyroXOffset},
-        {GyroYOffset},
-        {GyroZOffset}
-    };
-    float biasEstimate[3][1] = {
-        {0},
-        {0},
-        {0}
-    };
-    float magInertial[3][1] = {
-        {22770/1000},
-        {5329/1000},
-        {41510.2/1000}
-    };
-    float accelInertial[3][1] = {
-        {0},
-        {0},
-        {1}
-    };
-    int time = 0;
-    char OledOutput[100];
-    BOARD_Init();
-    BNO055_Init();
-    OledInit();
-    TIMERS_Init();
-    float X = 0; 
-    float Y = 0;
-    float Z = 0;
-    while(1){
-        // accel data calibration
-        accelXYZ[0] = (BNO055_ReadAccelX() - (-1013)) * (1000 - (-1000)) / (985 - (-1013)) + (-1000); // z axis calibration  
-        accelXYZ[1] = (BNO055_ReadAccelY() - (-1020)) * (1000 - (-1000)) / (979 - (-1020)) + (-1000); // y axis calibration 
-        accelXYZ[2] = (BNO055_ReadAccelZ() - (-1013)) * (1000 - (-1000)) / (989 - (-1013)) + (-1000); // x axis calibration
+float Kp_a = 10, Ki_a = 1, Kp_m = 0, Ki_m = 0;
+float deltaT = 0.02;
+float gyroXYZ[3];
+float accelXYZ[3];
+float magXYZ[3];
+float Bplus[3][1];
+float Rplus[3][3];
+float angles[3];
+float Rmisalignment[3][3] = {
+    {0.8967, 0.0234, 0.4421},
+    {0.2606, 0.7793, -0.5699},
+    {-0.3579, 0.6262, 0.6927}
+};
+float biasTerms[3][1] = {
+    {GyroXOffset},
+    {GyroYOffset},
+    {GyroZOffset}
+};
+float biasEstimate[3][1] = {
+    {0},
+    {0},
+    {0}
+};
+float magInertial[3][1] = {
+    {22770 / 1000},
+    {5329 / 1000},
+    {41510.2 / 1000}
+};
+float accelInertial[3][1] = {
+    {0},
+    {0},
+    {1}
+};
+int time = 0;
+char OledOutput[100];
 
-        // mag data calibration
-        magXYZ[0] = (BNO055_ReadMagX() - (-1210)) * (47430 + 47430) / ((-172) - (-1210)) - 47430; // z axis calibration  
-        magXYZ[1] = (BNO055_ReadMagY() - (-19)) * (47430 + 47430) / (719 - (-19)) - 47430; // y axis calibration 
-        magXYZ[2] = (BNO055_ReadMagZ() - 27) * (47430 + 47430) / (1016 - 27) - 47430; // x axis calibration 
+OledInit();
+TIMERS_Init();
+float X = 0;
+float Y = 0;
+float Z = 0;
+while (1) {
+    // accel data calibration
+    accelXYZ[0] = (BNO055_ReadAccelX() - (-1013)) * (1000 - (-1000)) / (985 - (-1013)) + (-1000); // z axis calibration  
+    accelXYZ[1] = (BNO055_ReadAccelY() - (-1020)) * (1000 - (-1000)) / (979 - (-1020)) + (-1000); // y axis calibration 
+    accelXYZ[2] = (BNO055_ReadAccelZ() - (-1013)) * (1000 - (-1000)) / (989 - (-1013)) + (-1000); // x axis calibration
 
-        
-        gyroXYZ[0] = ((BNO055_ReadGyroX() + GyroXOffset) / Raw2AngleConv) * deg2rad; // Read and convert X
-        gyroXYZ[1] = ((BNO055_ReadGyroY() + GyroYOffset) / Raw2AngleConv) * deg2rad; // Read and convert Y
-        gyroXYZ[2] = ((BNO055_ReadGyroZ() - GyroZOffset) / Raw2AngleConv) * deg2rad; // Read and convert Z
-        float gyroInput[3][1] = {
-            {gyroXYZ[0]},
-            {gyroXYZ[1]},
-            {gyroXYZ[2]}
-        };
-        float magReading[3][1] = {
-            {magXYZ[0]},
-            {magXYZ[1]},
-            {magXYZ[2]}
-        };
-        float accelReading[3][1] = {
-            {accelXYZ[0]},
-            {accelXYZ[1]},
-            {accelXYZ[2]}
-        };
-        float rotX[3][3] = {
-            {1, 0, 0},
-            {0, cos(gyroXYZ[0]), -sin(gyroXYZ[0])},
-            {0, sin(gyroXYZ[0]), cos(gyroXYZ[0])}
-        };
-        float rotY[3][3] = {
-            { cos(gyroXYZ[1]), 0, sin(gyroXYZ[1])},
-            {0, 1, 0},
-            {-sin(gyroXYZ[1]), 0, cos(gyroXYZ[1])}
-        };
-        float rotZ[3][3] = {
-            {cos(gyroXYZ[2]), -sin(gyroXYZ[2]), 0},
-            {sin(gyroXYZ[2]), cos(gyroXYZ[2]), 0},
-            {0, 0, 1}
-        };
-        float result1[3][3], R[3][3];
-        float gyroInputWithBias[3][1];
+    // mag data calibration
+    magXYZ[0] = (BNO055_ReadMagX() - (-1210)) * (47430 + 47430) / ((-172) - (-1210)) - 47430; // z axis calibration  
+    magXYZ[1] = (BNO055_ReadMagY() - (-19)) * (47430 + 47430) / (719 - (-19)) - 47430; // y axis calibration 
+    magXYZ[2] = (BNO055_ReadMagZ() - 27) * (47430 + 47430) / (1016 - 27) - 47430; // x axis calibration 
 
-        MatrixMultiply(rotX, rotY, result1);
-        MatrixMultiply(result1, rotZ, R);
-        MatrixAdd31(gyroInput, biasTerms, gyroInputWithBias);
-        IntegrateClosedLoop(R, biasEstimate, gyroInputWithBias, magReading, accelReading, magInertial, accelInertial, Kp_a, Ki_a, Kp_m, Ki_m, deltaT, Bplus, Rplus);
-        for (int i = 0; i < DIM; i++) {
-            for (int j = 0; j < DIM; j++) {
-                R[i][j] = Rplus[i][j];
-                biasEstimate[i][j] = Bplus[i][j];
-            }
+
+    gyroXYZ[0] = ((BNO055_ReadGyroX() + GyroXOffset) / Raw2AngleConv) * deg2rad; // Read and convert X
+    gyroXYZ[1] = ((BNO055_ReadGyroY() + GyroYOffset) / Raw2AngleConv) * deg2rad; // Read and convert Y
+    gyroXYZ[2] = ((BNO055_ReadGyroZ() - GyroZOffset) / Raw2AngleConv) * deg2rad; // Read and convert Z
+    float gyroInput[3][1] = {
+        {gyroXYZ[0]},
+        {gyroXYZ[1]},
+        {gyroXYZ[2]}
+    };
+    float magReading[3][1] = {
+        {magXYZ[0]},
+        {magXYZ[1]},
+        {magXYZ[2]}
+    };
+    float accelReading[3][1] = {
+        {accelXYZ[0]},
+        {accelXYZ[1]},
+        {accelXYZ[2]}
+    };
+    float rotX[3][3] = {
+        {1, 0, 0},
+        {0, cos(gyroXYZ[0]), -sin(gyroXYZ[0])},
+        {0, sin(gyroXYZ[0]), cos(gyroXYZ[0])}
+    };
+    float rotY[3][3] = {
+        { cos(gyroXYZ[1]), 0, sin(gyroXYZ[1])},
+        {0, 1, 0},
+        {-sin(gyroXYZ[1]), 0, cos(gyroXYZ[1])}
+    };
+    float rotZ[3][3] = {
+        {cos(gyroXYZ[2]), -sin(gyroXYZ[2]), 0},
+        {sin(gyroXYZ[2]), cos(gyroXYZ[2]), 0},
+        {0, 0, 1}
+    };
+    float result1[3][3], R[3][3];
+    float gyroInputWithBias[3][1];
+
+    MatrixMultiply(rotX, rotY, result1);
+    MatrixMultiply(result1, rotZ, R);
+    MatrixAdd31(gyroInput, biasTerms, gyroInputWithBias);
+    IntegrateClosedLoop(R, biasEstimate, gyroInputWithBias, magReading, accelReading, magInertial, accelInertial, Kp_a, Ki_a, Kp_m, Ki_m, deltaT, Bplus, Rplus);
+    for (int i = 0; i < DIM; i++) {
+        for (int j = 0; j < DIM; j++) {
+            R[i][j] = Rplus[i][j];
+            biasEstimate[i][j] = Bplus[i][j];
         }
-        EulerAngles(R, angles);
-//        angles[1] = (angles[1] - 14)/100;
-//        angles[0] = (angles[0] - 14)/100;
-//        angles[2] = (angles[2] - 35)/100;
-//        X = X + angles[1];
-//        Y = Y + angles[0];
-//        Z = Z + angles[2];
-        sprintf(OledOutput, "Roll: %f\nPitch: %f\nYaw: %f\r\n", angles[1], angles[0], angles[2]); // print roll, pitch, yaw
-        OledDrawString(OledOutput);
-        OledUpdate();
-
-        time = TIMERS_GetMilliSeconds(); // make a start time
-        while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
     }
+
+    EulerAngles(R, angles);
+
+    //        angles[1] = (angles[1] - 14)/100;
+    //        angles[0] = (angles[0] - 14)/100;
+    //        angles[2] = (angles[2] - 35)/100;
+    //        X = X + angles[1];
+    //        Y = Y + angles[0];
+    //        Z = Z + angles[2];
+    sprintf(OledOutput, "Roll: %f\nPitch: %f\nYaw: %f\r\n", angles[1], angles[0], angles[2]); // print roll, pitch, yaw
+    OledDrawString(OledOutput);
+    OledUpdate();
+
+    time = TIMERS_GetMilliSeconds(); // make a start time
+    while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
 }
-    
+
+
 #endif 
+}
+
