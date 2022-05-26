@@ -24,6 +24,8 @@ function [Rplus, Bplus] = IntegrateClosedLoop(Rminus, Bminus, gyros, mags, ...
 % gains are constant and set internally, modify as needed.
 
 
+
+
 accels = accels/norm(accels);                       % set mags and accels to unit vectors
 mags = mags/norm(mags);
 
@@ -39,4 +41,3 @@ bdot=-Ki_a*wmeas_a - Ki_m*wmeas_m;
     
 Rplus = Rexp(gyroInputWithFeedback, deltaT) * Rminus;
 Bplus = Bminus + bdot*deltaT;
-
