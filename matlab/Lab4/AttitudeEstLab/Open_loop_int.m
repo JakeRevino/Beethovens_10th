@@ -20,7 +20,7 @@ gby = mean(deg2rad(G(1:50, 2)));
 gbz = mean(deg2rad(G(1:50, 3)));
 
 % gyro input with bias
-gyroInputWithBias=gyroInput+[gbx;gby;gbz];
+
 
 % dcm matrix created from euler angles
 % C = eul2dcm(E);
@@ -28,8 +28,12 @@ C = [1 0 0; 0 1 0; 0 0 1];
 E1 = dcm2eul(C);
 
 % integrate with forward integration and matrix exponential
-Int1 = IntegrateOpenLoop(C, gyroInputWithBias, 0.02, 0);
-Int2 = IntegrateOpenLoop(C, gyroInputWithBias, 0.02, 1);
+for i = 1:20,
+    gyroInputWithBias=gyroInput+[gbx;gby;gbz];
+    Int1 = IntegrateOpenLoop(C, gyroInputWithBias, 0.02, 0);
+    Int2 = IntegrateOpenLoop(C, gyroInputWithBias, 0.02, 1);
+end
+
 
 % obtain euler angles from dcm matrices
 E2 = dcm2eul(Int1);
