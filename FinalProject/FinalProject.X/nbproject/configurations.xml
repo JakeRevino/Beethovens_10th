@@ -9,6 +9,11 @@
       <itemPath>../../Common/BOARD.h</itemPath>
       <itemPath>../../Common/ToneGeneration.h</itemPath>
       <itemPath>../../Common/serial.h</itemPath>
+      <itemPath>../../Common/Ascii.h</itemPath>
+      <itemPath>../../Common/I2C.h</itemPath>
+      <itemPath>../../Common/Oled.h</itemPath>
+      <itemPath>../../Common/OledDriver.h</itemPath>
+      <itemPath>../../Common/timers.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -23,6 +28,11 @@
       <itemPath>../../Common/ToneGeneration.c</itemPath>
       <itemPath>../../Common/serial.c</itemPath>
       <itemPath>TheTenthSymphony.c</itemPath>
+      <itemPath>../../Common/Ascii.c</itemPath>
+      <itemPath>../../Common/I2C.c</itemPath>
+      <itemPath>../../Common/Oled.c</itemPath>
+      <itemPath>../../Common/OledDriver.c</itemPath>
+      <itemPath>../../Common/timers.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -41,7 +51,7 @@
         <targetDevice>PIC32MX340F512H</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>noID</platformTool>
+        <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
         <languageToolchainVersion>4.00</languageToolchainVersion>
         <platform>3</platform>
@@ -250,6 +260,7 @@
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
@@ -322,6 +333,7 @@
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

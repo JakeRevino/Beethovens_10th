@@ -12,20 +12,35 @@
 #include "AD.h"
 #include "serial.h"
 #include "ToneGeneration.h"
+#include "Oled.h"
+#include "OledDriver.h"
+#include "Ascii.h"
+#include "I2C.h"
+#include "timers.h"
+
+#define _20ms 20
 
 /*
  * 
  */
-int main(int argc, char** argv) {
+int main(void) {
     /* Initializations*/
-    BOARD_Init();
+    int angleZ = 0;
+    int angleY = 0;
+    int angleX = 0;
+    BOARD_Init(); // initialize board and IMU components
     BNO055_Init();
-    AD_Init();
-    AD_AddPins(AD_A1);
-    
-    
-    /* Volume Control*/
-
-    return (EXIT_SUCCESS);
+    TIMERS_Init();
+    while (1){
+        int valX = (BNO055_ReadGyroX() + 11.02) / 131; // read gyro data, scale it and then print the correct value with a 20 ms delay
+        int valY = (BNO055_ReadGyroY() + 24.95) / 131;
+        int valZ = (BNO055_ReadGyroZ() - 12.15) / 131;
+        angleZ = (angleZ + valZ) ;
+        angleY = (angleY + valY) ;
+        angleX = (angleX + valX) ;
+        printf("Roll: %d   Pitch: %d   Yaw: %d\r\n", angleX/40, angleY/40, angleZ/38);
+        int time = TIMERS_GetMilliSeconds(); // make a start time
+        while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
+    }
 }
 
