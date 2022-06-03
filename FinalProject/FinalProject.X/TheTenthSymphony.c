@@ -24,7 +24,7 @@
 #define A_BIT       1830
 #define _20ms 20
 
-void TonePick(int angleX, int angleY, int angleZ, int note) {
+void TonePick(int angleX, int angleY, int angleZ, int note, int octave) {
     long double frequency;
     int step = 1;
     int frequency_int;
@@ -55,7 +55,8 @@ void TonePick(int angleX, int angleY, int angleZ, int note) {
     } else {
         step = 0;
     }
-    frequency = 440 * pow(1.059463, step);
+    frequency = 440 * pow(1.059463, step+12*octave);
+
     frequency_int = (int) frequency;
     printf("BBBBFrequency %d\r\n", frequency_int);
     ToneGeneration_SetFrequency(frequency_int);
@@ -83,8 +84,14 @@ int main(void) {
     printf("HERE");
 
     int flexVal = 0;
+    int flexVal2 = 0;
     int flexAngle = 0;
+    int flexAngle2 = 0;
+    int octave = 0;
+
     AD_AddPins(AD_A1);
+    AD_AddPins(AD_A2);
+
     while (1) {
         int valX = (BNO055_ReadGyroX() + 11.02) / 131; // read gyro data, scale it and then print the correct value with a 20 ms delay
         int valY = (BNO055_ReadGyroY() + 24.95) / 131;
@@ -92,26 +99,35 @@ int main(void) {
         angleZ = (angleZ + valZ);
         angleY = (angleY + valY);
         angleX = (angleX + valX);
-<<<<<<< HEAD
-        // printf("Roll: %d   Pitch: %d   Yaw: %d\r\n", angleX/40, angleY/40, angleZ/ 38);
-=======
-        printf("Roll: %d   Pitch: %d   Yaw: %d\r\n", (angleX/40) % 180, (angleY/40) % 180, (angleZ/38) % 180 );
->>>>>>> 0933f126394cbcfc049a3d739167ac9ca2f72da1
+//        angleZ = angleZ/40 % 180;
+//        angleY = angleY/40 % 180;
+//        angleX = angleX/40 % 180;
+        
+        printf("Roll: %d   Pitch: %d   Yaw: %d\r\n", angleX, angleY, angleZ );
         int time = TIMERS_GetMilliSeconds(); // make a start time
         while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
         if (AD_IsNewDataReady()) {
             flexVal = AD_ReadADPin(AD_A1); // read and store the reading
+            flexVal2= AD_ReadADPin(AD_A2);
             flexAngle = (3.27 * flexVal) + 349; // Eq. from Excel, using a 67k 
+            flexAngle2 = (3.27 * flexVal2) + 349; // Eq. from Excel, using a 67k 
+
         }
 
         printf("Flexangle %d\r\n", flexAngle);
-        if (flexAngle > 2000) {
+        if (flexAngle > 2500) {
             ToneGeneration_ToneOff();
         } else {
             ToneGeneration_ToneOn();
 
         }
-        TonePick(angleX / 40, angleY / 40, angleZ / 38, note);
+                if (flexAngle2 > 2500) {
+            octave =1;
+        } else {
+            octave =0;
+
+        }
+        TonePick(angleX / 40, angleY / 40, angleZ / 38, note, octave);
 
     }
 }
