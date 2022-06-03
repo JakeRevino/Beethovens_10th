@@ -92,7 +92,11 @@ int main(void) {
         angleZ = (angleZ + valZ);
         angleY = (angleY + valY);
         angleX = (angleX + valX);
+<<<<<<< HEAD
         // printf("Roll: %d   Pitch: %d   Yaw: %d\r\n", angleX/40, angleY/40, angleZ/ 38);
+=======
+        printf("Roll: %d   Pitch: %d   Yaw: %d\r\n", (angleX/40) % 180, (angleY/40) % 180, (angleZ/38) % 180 );
+>>>>>>> 0933f126394cbcfc049a3d739167ac9ca2f72da1
         int time = TIMERS_GetMilliSeconds(); // make a start time
         while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
         if (AD_IsNewDataReady()) {
