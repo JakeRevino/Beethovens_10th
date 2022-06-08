@@ -1,12 +1,19 @@
 /* 
  * File:   TheTenthSymphony.c
- * Author: zoeal
- *
+ * We designed and built a device which mimics a conductor?s wand with the goal
+ * to play music over a speaker based on the attitude of an inertial
+ * measurement unit (IMU). We will use the 3-axis gyroscope to create musical
+ * pitch differences based on the pitch and roll of the system. Every scale has
+ * a few main notes that form a root chord. The goal is to map each of these 
+ * main notes to a positive and negative pitch, and a positive or negative roll,
+ * while mapping the notes in-between to angles in-between.
  * Created on May 30, 2022, 11:38 AM
  */
 
+/*Libraries*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "BNO055.h"
 #include "BOARD.h"
 #include "AD.h"
@@ -17,62 +24,75 @@
 #include "Ascii.h"
 #include "I2C.h"
 #include "timers.h"
-#include <math.h>
 
+/*Defines*/
 #define DELAY(x)    {int wait; for (wait = 0; wait <= x; wait++) {asm("nop");}}
 #define A_LOT       183000
 #define A_BIT       1830
 #define _20ms 20
+#define ANGLE_BOUND 40
+#define SCALER_40 40
+#define SCALER_38 38
+#define TWELFTHROOT_OF2 1.059463
+#define TONE_A 440
+#define OCTAVE_JUMP 12
+#define ROOT 0
+#define SECOND 2
+#define THIRD 4
+#define FOURTH 5
+#define FIFTH 7 
+#define SIXTH 9
+#define SEVENTH 11
 
+
+/* This function chooses the tone that will come out of the speaker based on the
+ * roll pitch or yaw of the gyroscope based on the D major scale. If any of these
+ * angles are above 40 degrees, the tone will be chosen based on the axis with 
+ * the most extreme attitude*/
 void TonePick(int angleX, int angleY, int angleZ, int note, int octave) {
     long double frequency;
     int step = 1;
     int frequency_int;
-    printf("Roll: %d   Pitch: %d   Yaw: %d\r\n", abs(angleX), abs(angleY), abs(angleZ));
-
-    if ((abs(angleX) > 40) || (abs(angleY) > 40) || (abs(angleZ) > 40)) {
-        printf("1Roll1: %d   1Pitch1: %d   1Yaw1: %d\r\n", abs(angleX), abs(angleY), abs(angleZ));
-
+    
+   // If the yaw, pitch, or roll is at a more extreme angle than 40 degrees
+   // pick the note above the root based on the most extreme attitude
+    if ((abs(angleX) > ANGLE_BOUND) || (abs(angleY) > ANGLE_BOUND) || (abs(angleZ) > ANGLE_BOUND)) {
         if (abs(angleX) > abs(angleY) && abs(angleX) > abs(angleZ)) {
             if (angleX < 0) {
-                step = 10;
+                step = SEVENTH;
             } else {
-                step = 5;
+                step = FOURTH;
             }
         } else if (abs(angleY) > abs(angleX) && abs(angleY) > abs(angleZ)) {
             if (angleY < 0) {
-                step = 9;
+                step = SIXTH;
             } else {
-                step = 4;
+                step = THIRD;
             }
         } else {
             if (angleZ < 0) {
-                step = 7;
+                step = FIFTH;
             } else {
-                step = 2;
+                step = SECOND;
             }
         }
+    //else the chosen tone will be the root note
     } else {
-        step = 0;
+        step = ROOT;
     }
-    frequency = 440 * pow(1.059463, step+12*octave);
+    //f(n)= 440* 12th_root(2)^(key_number)
+    frequency = TONE_A * pow(TWELFTHROOT_OF2, (step + OCTAVE_JUMP * octave)
+            - FIFTH);
 
+    //Frequency is converted from float to int and sent to the pin 3
     frequency_int = (int) frequency;
-    printf("BBBBFrequency %d\r\n", frequency_int);
     ToneGeneration_SetFrequency(frequency_int);
 }
 
 int main(void) {
     /* Initializations*/
-    int angleZ = 0;
-    int angleY = 0;
-    int angleX = 0;
-    int note = 49;
-    printf("HERE1");
-
     BOARD_Init(); // initialize board and IMU components
     DELAY(A_LOT);
-    printf("HERE2");
 
     BNO055_Init();
     DELAY(A_BIT);
@@ -81,53 +101,57 @@ int main(void) {
     ToneGeneration_Init();
     ToneGeneration_SetFrequency(200);
     ToneGeneration_ToneOn();
-    printf("HERE");
-
+    
+    /* Variables */
+    int angleZ = 0;
+    int angleY = 0;
+    int angleX = 0;
+    int note = 49;
     int flexVal = 0;
     int flexVal2 = 0;
     int flexAngle = 0;
     int flexAngle2 = 0;
     int octave = 0;
 
+    /* Analog to digital pins for reading voltage */
     AD_AddPins(AD_A1);
     AD_AddPins(AD_A2);
 
     while (1) {
-        int valX = (BNO055_ReadGyroX() + 11.02) / 131; // read gyro data, scale it and then print the correct value with a 20 ms delay
+        // read gyro data, scale it and then print the correct value with a 20 ms delay
+        int valX = (BNO055_ReadGyroX() + 11.02) / 131; 
         int valY = (BNO055_ReadGyroY() + 24.95) / 131;
         int valZ = (BNO055_ReadGyroZ() - 12.15) / 131;
         angleZ = (angleZ + valZ);
         angleY = (angleY + valY);
         angleX = (angleX + valX);
-//        angleZ = angleZ/40 % 180;
-//        angleY = angleY/40 % 180;
-//        angleX = angleX/40 % 180;
-        
-        printf("Roll: %d   Pitch: %d   Yaw: %d\r\n", angleX, angleY, angleZ );
+    
+
         int time = TIMERS_GetMilliSeconds(); // make a start time
         while ((TIMERS_GetMilliSeconds() - time) < _20ms); // delay
         if (AD_IsNewDataReady()) {
             flexVal = AD_ReadADPin(AD_A1); // read and store the reading
-            flexVal2= AD_ReadADPin(AD_A2);
+            flexVal2 = AD_ReadADPin(AD_A2);
             flexAngle = (3.27 * flexVal) + 349; // Eq. from Excel, using a 67k 
             flexAngle2 = (3.27 * flexVal2) + 349; // Eq. from Excel, using a 67k 
-
         }
 
-        printf("Flexangle %d\r\n", flexAngle);
-        if (flexAngle > 2500) {
+        // turn off tone when bend sensor is bent
+        if (flexAngle > 2000) {
             ToneGeneration_ToneOff();
         } else {
             ToneGeneration_ToneOn();
-
         }
-                if (flexAngle2 > 2500) {
-            octave =1;
+        
+        // raise the tone by an octave when 2nd bend sensor is bent
+        if (flexAngle2 > 2500) {
+            octave = 1;
         } else {
-            octave =0;
-
+            octave = 0;
         }
-        TonePick(angleX / 40, angleY / 40, angleZ / 38, note, octave);
+        
+        //pick the tone using calibrated scaling factors
+        TonePick(angleX / SCALER_40, angleY / SCALER_40, angleZ / SCALER_38, note, octave);
 
     }
 }
